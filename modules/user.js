@@ -87,12 +87,12 @@ User.init({
         field: 'user_password'
     },
     last_login: {
-        type: DataTypes.DATE,
+        type: DataTypes.Date,
         allowNull: true,
         field: 'last_login'
     },
-    user_id: function (models) {
-        category_js_1.Category.belongsTo(models.User, {
+    user_id: function () {
+        User.belongsTo(category_js_1.Category, {
             foreignKey: { name: 'user_id', allowNull: false }
         });
     }

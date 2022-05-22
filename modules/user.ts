@@ -34,8 +34,8 @@ User.init({
     allowNull: true,
     field: 'last_login'
   },
-  user_id: (models: any) => {
-    Category.belongsTo(models.User, {
+  user_id: () => {
+    User.belongsTo(Category, {
       foreignKey: { name: 'user_id', allowNull: false }
     });
   }

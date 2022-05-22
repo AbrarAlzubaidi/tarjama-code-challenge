@@ -71,9 +71,9 @@ Category.init({
         autoIncrement: true,
         field: 'category_id'
     },
-    user_id: function (models) {
-        Category.hasMany(models.User, {
-            foreignKey: { name: 'user_id', allowNull: false }
+    user_id: function () {
+        Category.hasMany(user_js_1.User, {
+            foreignKey: { name: 'user_id', allowNull: false, onDelete: 'CASCADE' }
         });
     },
     name: {
@@ -84,22 +84,20 @@ Category.init({
 }, { sequelize: sequelize });
 // create a new user
 var createCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, name, email, password, last_login;
+    var id, user_id, name;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 id = request.body.id;
+                user_id = request.body.user_id;
                 name = request.body.name;
-                email = request.body.email;
-                password = request.body.password;
-                last_login = request.body.last_login;
-                return [4 /*yield*/, Category.create({ id: id, namr: name, email: email, password: password, last_login: last_login })];
+                return [4 /*yield*/, Category.create({ id: id, user_id: user_id, name: name })];
             case 1:
                 _a.sent();
-                user_js_1.User.find().then(function (data) {
+                Category.find().then(function (data) {
                     response.status(200).json(data);
                 })["catch"](function () {
-                    response.status(500).send('error there is no recived data');
+                    response.status(500).send('error there is no received data');
                 });
                 return [2 /*return*/];
         }
@@ -108,10 +106,24 @@ var createCategory = function (request, response) { return __awaiter(void 0, voi
 exports.createCategory = createCategory;
 // get a login user
 var getCategories = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        Category.findAll().then(function (response) {
+            if (response) {
+                response.json();
+            }
+            else {
+                throw new Error('no data');
+            }
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.getCategories = getCategories;
+var getCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
     var id;
     return __generator(this, function (_a) {
         id = request.params.id;
-        user_js_1.User.findAll({
+        Category.findAll({
             where: {
                 authorId: id
             }
@@ -126,16 +138,31 @@ var getCategories = function (request, response) { return __awaiter(void 0, void
         return [2 /*return*/];
     });
 }); };
-exports.getCategories = getCategories;
-var getCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        return [2 /*return*/];
-    });
-}); };
 exports.getCategory = getCategory;
 var editCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
+    var categoryId, updatecategory_1, option, updatedCategoryList, error_1;
     return __generator(this, function (_a) {
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                categoryId = request.params.id;
+                updatecategory_1 = request.body;
+                option = { "new": true };
+                Category.findByIdAndUpdate({ _id: categoryId }, updatecategory_1, option).then(function (result) {
+                    result.name = updatecategory_1.name;
+                    result.save();
+                });
+                return [4 /*yield*/, Category.find({})];
+            case 1:
+                updatedCategoryList = _a.sent();
+                response.status(200).send(updatedCategoryList);
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                new Error("Something went wrong");
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
     });
 }); };
 exports.editCategory = editCategory;
