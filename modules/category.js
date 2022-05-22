@@ -1,68 +1,13 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Category = exports.editCategory = exports.getCategory = exports.getCategories = exports.createCategory = void 0;
-var _a = require('sequelize'), Sequelize = _a.Sequelize, DataTypes = _a.DataTypes, Model = _a.Model;
-var sequelizer = require("../database/sequelize.js");
-var sequelize = sequelizer;
-var user_js_1 = require("./user.js");
-var Category = /** @class */ (function (_super) {
-    __extends(Category, _super);
-    function Category() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return Category;
-}(Model));
+const { Sequelize, DataTypes, Model } = require('sequelize');
+const sequelizer = require("../database/sequelize.js");
+const sequelize = sequelizer;
+const user_js_1 = require("./user.js");
+const expenses_js_1 = require("./expenses.js");
+class Category extends Model {
+}
 exports.Category = Category;
 Category.init({
     id: {
@@ -71,9 +16,14 @@ Category.init({
         autoIncrement: true,
         field: 'category_id'
     },
-    user_id: function () {
+    user_category_id: () => {
         Category.hasMany(user_js_1.User, {
-            foreignKey: { name: 'user_id', allowNull: false, onDelete: 'CASCADE' }
+            foreignKey: { name: 'user_category_id', allowNull: false, onDelete: 'CASCADE' }
+        });
+    },
+    category_expense_id: () => {
+        Category.belongsTo(expenses_js_1.Expense, {
+            foreignKey: { name: 'category_expense_id', allowNull: false }
         });
     },
     name: {
@@ -81,88 +31,57 @@ Category.init({
         allowNull: false,
         field: 'category_name'
     }
-}, { sequelize: sequelize });
-// create a new user
-var createCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, user_id, name;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                id = request.body.id;
-                user_id = request.body.user_id;
-                name = request.body.name;
-                return [4 /*yield*/, Category.create({ id: id, user_id: user_id, name: name })];
-            case 1:
-                _a.sent();
-                Category.find().then(function (data) {
-                    response.status(200).json(data);
-                })["catch"](function () {
-                    response.status(500).send('error there is no received data');
-                });
-                return [2 /*return*/];
-        }
+}, { sequelize });
+const createCategory = async (request, response) => {
+    let { id, user_category_id, name } = request.body;
+    await Category.create({ id: id, user_category_id: user_category_id, name: name });
+    Category.findAll().then((data) => {
+        response.status(200).json(data);
+    }).catch(() => {
+        response.status(500).send('error you should fill all fields');
     });
-}); };
+};
 exports.createCategory = createCategory;
-// get a login user
-var getCategories = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        Category.findAll().then(function (response) {
-            if (response) {
-                response.json();
-            }
-            else {
-                throw new Error('no data');
-            }
-        });
-        return [2 /*return*/];
-    });
-}); };
-exports.getCategories = getCategories;
-var getCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    var id;
-    return __generator(this, function (_a) {
-        id = request.params.id;
-        Category.findAll({
-            where: {
-                authorId: id
-            }
-        }).then(function (response) {
-            if (response) {
-                response.json();
-            }
-            else {
-                throw new Error('no data');
-            }
-        });
-        return [2 /*return*/];
-    });
-}); };
-exports.getCategory = getCategory;
-var editCategory = function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
-    var categoryId, updatecategory_1, option, updatedCategoryList, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                categoryId = request.params.id;
-                updatecategory_1 = request.body;
-                option = { "new": true };
-                Category.findByIdAndUpdate({ _id: categoryId }, updatecategory_1, option).then(function (result) {
-                    result.name = updatecategory_1.name;
-                    result.save();
-                });
-                return [4 /*yield*/, Category.find({})];
-            case 1:
-                updatedCategoryList = _a.sent();
-                response.status(200).send(updatedCategoryList);
-                return [3 /*break*/, 3];
-            case 2:
-                error_1 = _a.sent();
-                new Error("Something went wrong");
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+const getCategories = async (request, response) => {
+    Category.findAll().then((data) => {
+        if (data) {
+            response.status(200).json(data);
+        }
+        else {
+            throw new Error('no data');
         }
     });
-}); };
+};
+exports.getCategories = getCategories;
+const getCategory = async (request, response) => {
+    let id = request.params.id;
+    Category.findAll({
+        where: {
+            id: id
+        }
+    }).then((data) => {
+        if (data) {
+            response.status(200).json(data);
+        }
+        else {
+            throw new Error('there is no such category');
+        }
+    });
+};
+exports.getCategory = getCategory;
+const editCategory = async (request, response) => {
+    try {
+        let categoryId = request.params.id;
+        let updatecategory = request.body;
+        let option = { new: true };
+        Category.findByIdAndUpdate({ _id: categoryId }, updatecategory, option).then((result) => {
+            result.name = updatecategory.name;
+        });
+        let updatedCategoryList = await Category.find({});
+        response.status(200).json(updatedCategoryList);
+    }
+    catch (error) {
+        new Error("Something went wrong");
+    }
+};
 exports.editCategory = editCategory;

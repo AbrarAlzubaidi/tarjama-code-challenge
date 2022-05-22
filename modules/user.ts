@@ -1,9 +1,9 @@
-import { ConnectionAcquireTimeoutError } from "sequelize/types";
-
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelizer = require("../database/sequelize.js");
 const sequelize = sequelizer;
+
 import { Category } from "./category.js";
+import {Expense} from "./expenses.js";
 
 class User extends Model {
 }
@@ -34,22 +34,29 @@ User.init({
     allowNull: true,
     field: 'last_login'
   },
-  user_id: () => {
+  user_category_id: () => {
     User.belongsTo(Category, {
-      foreignKey: { name: 'user_id', allowNull: false }
+      foreignKey: { name: 'user_category_id', allowNull: false }
+    });
+  },
+  user_expense_id: () => {
+    User.belongsTo(Expense, {
+      foreignKey: { name: 'user_expense_id', allowNull: false }
     });
   }
 }, { sequelize });
 
 // create a new user
 const createUser = async (request: any, response: any) => {
-  let id = request.body.id;
-  let name = request.body.name;
-  let email = request.body.email;
-  let password = request.body.password;
-  let last_login = request.body.last_login;
+  let {id , name, email, password, last_login} = request.body;
 
-  await User.create({ id: id, namr: name, email: email, password: password, last_login: last_login });
+  await User.create({ 
+    id: id,
+    namr: name,
+    email: email,
+    password: password,
+    last_login: last_login
+ });
   User.find().then((data: any) => {
     response.status(200).json(data);
   }).catch(() => {
@@ -58,15 +65,15 @@ const createUser = async (request: any, response: any) => {
 };
 
 // get a login user
-const getLoggedUser = async (request: any, response: Response) => {
+const getLoggedUser = async (request: any, response: any) => {
   let id = request.params.id
   User.findAll({
     where: {
-      authorId: id
+      id: id
     }
-  }).then((response: Response) => {
+  }).then((data: any) => {
     if (response) {
-      response.json();
+      response.status(200).json(data);
     } else {
       throw new Error('no data')
     }

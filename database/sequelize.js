@@ -1,4 +1,7 @@
 "use strict";
-exports.__esModule = true;
-var sequelize_1 = require("../node_modules/sequelize/types/sequelize");
-exports["default"] = new sequelize_1["default"]("".concat(process.env.dbURL));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sequelizer = void 0;
+const { Sequelize } = require('sequelize');
+require("dotenv").config();
+const sequelizer = new Sequelize(`${process.env.dbURL}`);
+exports.sequelizer = sequelizer;

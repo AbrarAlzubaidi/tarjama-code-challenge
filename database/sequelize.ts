@@ -1,5 +1,7 @@
-import Sequelize from "../node_modules/sequelize/types/sequelize";
-export default  new Sequelize(`${process.env.dbURL}`);
+const { Sequelize } = require('sequelize');
+require("dotenv").config();
+const sequelizer = new Sequelize(`${process.env.dbURL}`)
+export {sequelizer} ;
 
 
  
