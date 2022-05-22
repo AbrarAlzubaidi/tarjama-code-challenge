@@ -36,13 +36,13 @@ The application consists of 3 modules:
     - amount
 ### Resources and APIs
 1. User:
-	- Register: Creating an account by the user name, email, and password.
-    - Login
+	- Register: Creating an account by the user name, email, and password.(post)
+    - Login: return specific user (get)
 2. Category (For the logged in user)
-	- Create
-    - Edit
-    - Get
-    - List
+	- Create (post)
+    - Edit ()
+    - Get (get specific)
+    - List (get all)
 3. Expenses (For the logged in user)
 	- Create
     - Edit
